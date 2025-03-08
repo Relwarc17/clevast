@@ -19,12 +19,12 @@ class ClevastBinarySwitch(ClevastEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs):  # pylint: disable=unused-argument
         """Turn on the switch."""
-        await self.coordinator.api.async_set_title("bar")
+        await self.coordinator._api.async_set_title("bar")
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):  # pylint: disable=unused-argument
         """Turn off the switch."""
-        await self.coordinator.api.async_set_title("foo")
+        await self.coordinator._api.async_set_title("foo")
         await self.coordinator.async_request_refresh()
 
     @property
