@@ -83,7 +83,7 @@ class ClevastApiClient:
     ) -> dict:
         """Get information from the API."""
         _LOGGER.debug("Before async_timeout")
-        async with async_timeout.timeout(TIMEOUT, loop=asyncio.get_event_loop()):
+        async with async_timeout.timeout(30, loop=asyncio.get_event_loop()):
             _LOGGER.debug("Inside async_timeout")
             if method == "get":
                 _LOGGER.info("Sending GET request")
