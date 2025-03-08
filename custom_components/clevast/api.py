@@ -49,12 +49,15 @@ class ClevastApiClient:
         }
         response = await self.api_wrapper("post", url, data=login_data, headers=HEADERS)
         _LOGGER.info("API Login Response: %s", json.dumps(response, indent=2))
+        
+        _LOGGER.info(response["message"])
         if "message" not in response and response["message"] != "Success":
             _LOGGER.error("Error authenticating")
-            raise aiohttp.web.HTTPUnauthorized
+            #raise aiohttp.web.HTTPUnauthorized
+        _LOGGER.info(response["result"])
         self._token = response["result"]["token"]
         self._last_login_time = time.time()
-        _LOGGER.info("Login erfolgreich, Token erhalten.")
+        _LOGGER.info("Login succesfull, Token acquired.")
     
     
     async def get_device(self) -> dict:
