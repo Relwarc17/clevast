@@ -1,0 +1,10 @@
+{
+  "domain": "clevast",
+  "name": "Clevast",
+  "documentation": "https://github.com/Relwarc17/clevast",
+  "issue_tracker": "https://github.com/Relwarc17/clevast/issues",
+  "dependencies": [],
+  "config_flow": true,
+  "codeowners": ["@Relwarc17"],
+  "requirements": []
+}
