@@ -5,6 +5,7 @@
   "issue_tracker": "https://github.com/Relwarc17/clevast/issues",
   "dependencies": [],
   "config_flow": true,
+  "version": "1.0.0",
   "codeowners": ["@Relwarc17"],
   "requirements": []
 }
