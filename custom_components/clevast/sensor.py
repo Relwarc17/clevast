@@ -1,9 +1,18 @@
 """Sensor platform for Clevast."""
+from custom_components.clevast import ClevastDataUpdateCoordinator
+from custom_components.clevast.clevast_device import ClevastDeviceInfo
 from .const import DEFAULT_NAME
 from .const import DOMAIN
 from .const import ICON
 from .const import SENSOR
 from .entity import ClevastEntity
+
+from homeassistant.const import PERCENTAGE
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
@@ -12,8 +21,24 @@ async def async_setup_entry(hass, entry, async_add_devices):
     async_add_devices([ClevastSensor(coordinator, entry)])
 
 
-class ClevastSensor(ClevastEntity):
+class ClevastSensor(ClevastEntity, SensorEntity):
     """clevast Sensor class."""
+    
+    _attr_translation_key = "humidity"
+    _attr_device_class = SensorDeviceClass.HUMIDITY
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = PERCENTAGE
+
+    def __init__(
+        self,
+        coordinator: ClevastDataUpdateCoordinator,
+        device: ClevastDeviceInfo,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator, device)
+        assert self.unique_id is not None
+        self.unique_id += "-humidity"
+        self.entity_id = f"sensor.{self.entity_id_base}_humidity"
 
     @property
     def name(self):
@@ -34,3 +59,8 @@ class ClevastSensor(ClevastEntity):
     def device_class(self):
         """Return de device class of the sensor."""
         return "clevast__custom_device_class"
+    
+    @property
+    def native_value(self) -> int:
+        """Return current environment humidity."""
+        return self.coordinator.data.state.environment_humidity
