@@ -14,7 +14,10 @@ TIMEOUT = 10
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
-HEADERS = {"Content-type": "application/json; charset=UTF-8"}
+HEADERS = {
+    "Content-type": "application/json; charset=UTF-8",
+    "User-Agent": "Clevast/1.7.16 (iPhone; iOS 18.3.1; Scale/3.00)"
+}
 
 
 class ClevastApiClient:
