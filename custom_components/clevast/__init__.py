@@ -76,7 +76,7 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
         """Initialize."""
         self._api = client
         self._platforms = []
-        self._device = MyDevice | None = None
+        self._device = ClevastEntity | None = None
         super().__init__(hass, _LOGGER, name=DOMAIN, config_entry = entry, update_interval=SCAN_INTERVAL)
 
     async def _async_setup(self):
@@ -96,7 +96,7 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
         try:
             await self._api.login()
             
-            return await self._api.async_get_data()
+            return await self._api.get_device()
         except Exception as exception:
             raise UpdateFailed() from exception
 
