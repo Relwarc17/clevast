@@ -41,7 +41,7 @@ class ClevastApiClient:
         login_data = {
             "email": self._username,
             "privacyFlag": False,
-            "password": hashlib.md5(self._password.encode()),
+            "password": hashlib.md5(self._password.encode()).digest().decode(),
             "phoneVersion":"18.3.1",
             "phoneBrand":"iPhone",
             "phoneModel":"iPhone17,1"
