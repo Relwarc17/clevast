@@ -83,7 +83,9 @@ class ClevastApiClient:
     ) -> dict:
         """Get information from the API."""
         try:
+            _LOGGER.debug("Before async_timeout")
             async with async_timeout.timeout(TIMEOUT, loop=asyncio.get_event_loop()):
+                _LOGGER.debug("Inside async_timeout")
                 if method == "get":
                     _LOGGER.info("Sending GET request")
                     response = await self._session.get(url, headers=headers)
@@ -97,7 +99,7 @@ class ClevastApiClient:
 
                 elif method == "post":
                     _LOGGER.info("Sending POST request")
-                    response = await self._session.post(url, headers=headers, json=data)
+                    response = await self._session.post(url, headers=headers, json=data, proxies={"http":"http://192.168.179.62:8080","https":"http://192.168.179.62:8080"})
                     #return await response.json()
                 _LOGGER.info(response.status_code)
                 _LOGGER.info(response.text)
