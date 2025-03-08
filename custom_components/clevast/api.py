@@ -57,11 +57,12 @@ class ClevastApiClient:
         _LOGGER.info(response["result"])
         self._token = response["result"]["token"]
         self._last_login_time = time.time()
+        HEADERS["Authorization"] = self._token
         _LOGGER.info("Login succesfull, Token acquired.")
     
     
     async def get_device(self) -> dict:
-        self._ensure_token()
+        await self._ensure_token()
         url = f"{self._baseurl}/clevast/api/user/device"
         response = await self.api_wrapper("get", url, headers=HEADERS)
         _LOGGER.info("API Login Response: %s", json.dumps(response, indent=2))
