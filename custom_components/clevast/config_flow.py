@@ -64,7 +64,7 @@ class ClevastFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         try:
             session = async_create_clientsession(self.hass)
             client = ClevastApiClient(username, password, session)
-            await client.async_get_data()
+            await client.login()
             return True
         except Exception:  # pylint: disable=broad-except
             pass

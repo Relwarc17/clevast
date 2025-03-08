@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     session = async_get_clientsession(hass)
     client = ClevastApiClient(username, password, session)
 
-    coordinator = ClevastDataUpdateCoordinator(hass, client=client)
+    coordinator = ClevastDataUpdateCoordinator(hass, entry, client=client)
     await coordinator.async_refresh()
 
     if not coordinator.last_update_success:
@@ -70,18 +70,33 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
     def __init__(
         self,
         hass: HomeAssistant,
+        entry: ConfigEntry,
         client: ClevastApiClient,
     ) -> None:
         """Initialize."""
-        self.api = client
-        self.platforms = []
+        self._api = client
+        self._platforms = []
+        self._device = MyDevice | None = None
+        super().__init__(hass, _LOGGER, name=DOMAIN, config_entry = entry, update_interval=SCAN_INTERVAL)
 
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
+    async def _async_setup(self):
+        """Set up the coordinator
+
+        This is the place to set up your coordinator,
+        or to load data, that only needs to be loaded once.
+
+        This method will be called automatically during
+        coordinator.async_config_entry_first_refresh.
+        """
+        self._device = await self._api.get_device()
 
     async def _async_update_data(self):
+        
         """Update data via library."""
         try:
-            return await self.api.async_get_data()
+            await self._api.login()
+            
+            return await self._api.async_get_data()
         except Exception as exception:
             raise UpdateFailed() from exception
 
