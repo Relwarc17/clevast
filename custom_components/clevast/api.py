@@ -38,10 +38,11 @@ class ClevastApiClient:
             _LOGGER.info("Token still valid, skipping login.")
             return
         url = f"{self._baseurl}/clevast/api/user/login"
+        md5_password = hashlib.md5(self._password.encode()).hexdigest()
         login_data = {
             "email": self._username,
             "privacyFlag": False,
-            "password": hashlib.md5(self._password.encode()).digest().decode(),
+            "password": md5_password,
             "phoneVersion":"18.3.1",
             "phoneBrand":"iPhone",
             "phoneModel":"iPhone17,1"
