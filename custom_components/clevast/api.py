@@ -99,7 +99,7 @@ class ClevastApiClient:
 
             elif method == "post":
                 _LOGGER.info("Sending POST request")
-                response = await self._session.post(url, headers=headers, json=data, proxies={"http":"http://192.168.179.62:8080","https":"http://192.168.179.62:8080"})
+                response = await self._session.post(url, headers=headers, json=data)
                 #return await response.json()
             _LOGGER.info(response.status_code)
             _LOGGER.info(response.text)
