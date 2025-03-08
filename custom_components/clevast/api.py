@@ -9,8 +9,7 @@ import time
 import aiohttp
 import async_timeout
 
-TIMEOUT = 10
-
+TIMEOUT = 30
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
@@ -96,7 +95,7 @@ class ClevastApiClient:
                     response = await self._session.patch(url, headers=headers, json=data)
 
                 elif method == "post":
-                    await self._session.post(url, headers=headers, json=data)
+                    response = await self._session.post(url, headers=headers, json=data)
                     #return await response.json()
                 return await response.json()
         except asyncio.TimeoutError as exception:
