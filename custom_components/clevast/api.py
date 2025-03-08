@@ -87,24 +87,22 @@ class ClevastApiClient:
             _LOGGER.debug("Before async_timeout")
             async with async_timeout.timeout(TIMEOUT):
                 _LOGGER.debug("Inside async_timeout")
-            if method == "get":
-                _LOGGER.info("Sending GET request")
-                response = await self._session.get(url, headers=headers)
-                #return await response.json()
+                if method == "get":
+                    _LOGGER.info("Sending GET request")
+                    response = await self._session.get(url, headers=headers)
+                    #return await response.json()
 
-            elif method == "put":
-                response = await self._session.put(url, headers=headers, json=data)
+                elif method == "put":
+                    response = await self._session.put(url, headers=headers, json=data)
 
-            elif method == "patch":
-                response = await self._session.patch(url, headers=headers, json=data)
+                elif method == "patch":
+                    response = await self._session.patch(url, headers=headers, json=data)
 
-            elif method == "post":
-                _LOGGER.info("Sending POST request")
-                response = await self._session.post(url, headers=headers, json=data)
-                #return await response.json()
-            _LOGGER.info(response.status_code)
-            _LOGGER.info(response.text)
-            return await response.json()
+                elif method == "post":
+                    _LOGGER.info("Sending POST request")
+                    response = await self._session.post(url, headers=headers, json=data)
+                    #return await response.json()
+                return await response.json()
         except asyncio.TimeoutError as exception:
             _LOGGER.error(
                 "Timeout error fetching information from %s - %s",
