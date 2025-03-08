@@ -82,25 +82,46 @@ class ClevastApiClient:
         self, method: str, url: str, data: dict = {}, headers: dict = {}
     ) -> dict:
         """Get information from the API."""
-        _LOGGER.debug("Before async_timeout")
-        async with async_timeout.timeout(30, loop=asyncio.get_event_loop()):
-            _LOGGER.debug("Inside async_timeout")
-            if method == "get":
-                _LOGGER.info("Sending GET request")
-                response = await self._session.get(url, headers=headers)
-                #return await response.json()
+        try:
+            _LOGGER.debug("Before async_timeout")
+            async with async_timeout.timeout(TIMEOUT):
+                _LOGGER.debug("Inside async_timeout")
+                if method == "get":
+                    _LOGGER.info("Sending GET request")
+                    response = await self._session.get(url, headers=headers)
+                    #return await response.json()
 
-            elif method == "put":
-                response = await self._session.put(url, headers=headers, json=data)
+                elif method == "put":
+                    response = await self._session.put(url, headers=headers, json=data)
 
-            elif method == "patch":
-                response = await self._session.patch(url, headers=headers, json=data)
+                elif method == "patch":
+                    response = await self._session.patch(url, headers=headers, json=data)
 
-            elif method == "post":
-                _LOGGER.info("Sending POST request")
-                response = await self._session.post(url, headers=headers, json=data, proxies={"http":"http://192.168.179.62:8080","https":"http://192.168.179.62:8080"})
-                #return await response.json()
-            _LOGGER.info(response.status_code)
-            _LOGGER.info(response.text)
-            return await response.json()
-       
+                elif method == "post":
+                    _LOGGER.info("Sending POST request")
+                    response = await self._session.post(url, headers=headers, json=data, proxies={"http":"http://192.168.179.62:8080","https":"http://192.168.179.62:8080"})
+                    #return await response.json()
+                _LOGGER.info(response.status_code)
+                _LOGGER.info(response.text)
+                return await response.json()
+        except asyncio.TimeoutError as exception:
+            _LOGGER.error(
+                "Timeout error fetching information from %s - %s",
+                url,
+                exception,
+            )
+
+        except (KeyError, TypeError) as exception:
+            _LOGGER.error(
+                "Error parsing information from %s - %s",
+                url,
+                exception,
+            )
+        except (aiohttp.ClientError, socket.gaierror) as exception:
+            _LOGGER.error(
+                "Error fetching information from %s - %s",
+                url,
+                exception,
+            )
+        except Exception as exception:  # pylint: disable=broad-except
+            _LOGGER.error("Something really wrong happened! - %s", exception)
