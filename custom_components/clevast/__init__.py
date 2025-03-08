@@ -76,6 +76,7 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
         """Initialize."""
         self._api = client
         self._platforms = []
+        self._device = None
         super().__init__(hass, _LOGGER, name=DOMAIN, config_entry = entry, update_interval=SCAN_INTERVAL)
 
     async def _async_setup(self):
