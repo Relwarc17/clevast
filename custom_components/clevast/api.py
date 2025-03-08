@@ -52,7 +52,7 @@ class ClevastApiClient:
         if "message" not in response and response["message"] != "Success":
             _LOGGER.error("Error authenticating")
             raise aiohttp.web.HTTPUnauthorized
-        self._token = response["data"]["token"]
+        self._token = response["result"]["token"]
         self._last_login_time = time.time()
         _LOGGER.info("Login erfolgreich, Token erhalten.")
     
