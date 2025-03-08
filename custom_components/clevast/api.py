@@ -59,7 +59,7 @@ class ClevastApiClient:
     async def get_device(self) -> dict:
         self._ensure_token()
         url = f"{self._baseurl}/clevast/api/user/device"
-        response = await self.api_wrapper("get", url)
+        response = await self.api_wrapper("get", url, headers=HEADERS)
         _LOGGER.info("API Login Response: %s", json.dumps(response, indent=2))
         return response
     
@@ -67,7 +67,7 @@ class ClevastApiClient:
     async def async_get_data(self) -> dict:
         """Get data from the API."""
         url = "https://jsonplaceholder.typicode.com/posts/1"
-        return await self.api_wrapper("get", url)
+        return await self.api_wrapper("get", url, headers=HEADERS)
 
     async def async_set_title(self, value: str) -> None:
         """Get data from the API."""
