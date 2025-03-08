@@ -1,5 +1,5 @@
 """Sensor platform for Clevast."""
-from . import ClevastDataUpdateCoordinator
+
 from .clevast_device import ClevastDeviceInfo
 from .const import DEFAULT_NAME
 from .const import DOMAIN
@@ -31,7 +31,7 @@ class ClevastSensor(ClevastEntity, SensorEntity):
 
     def __init__(
         self,
-        coordinator: ClevastDataUpdateCoordinator,
+        coordinator,
         device: ClevastDeviceInfo,
     ) -> None:
         """Initialize the sensor."""

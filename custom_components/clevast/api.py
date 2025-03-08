@@ -66,7 +66,9 @@ class ClevastApiClient:
         url = f"{self._baseurl}/clevast/api/user/device"
         response = await self.api_wrapper("get", url, headers=HEADERS)
         _LOGGER.info("API Login Response: %s", json.dumps(response, indent=2))
-        return response
+        if not "result" in response:
+            return dict()
+        return response["result"]
     
     
     async def async_get_data(self, device_id) -> dict:
