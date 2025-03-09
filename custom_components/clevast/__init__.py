@@ -13,9 +13,8 @@ from .coordinator import ClevastDataUpdateCoordinator
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core_config import Config
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers.device_registry import DeviceEntry
 
 from .api import ClevastApiClient
 from .const import CONF_PASSWORD
@@ -48,45 +47,47 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     session = async_get_clientsession(hass)
     my_api = ClevastApiClient(username, password, session)
 
-    _LOGGER.info("Creating cordinator")
-    coordinator = ClevastDataUpdateCoordinator(hass, entry, my_api)
-    _LOGGER.info("Sync coordinator")
+    hass.data[DOMAIN][entry.entry_id] = my_api
 
-    await coordinator.async_config_entry_first_refresh()
+    #_LOGGER.info("Creating cordinator")
+    #coordinator = ClevastDataUpdateCoordinator(hass, entry, my_api)
+    #_LOGGER.info("Sync coordinator")
+
+    #await coordinator.async_config_entry_first_refresh()
     # await coordinator.async_refresh()
 
-    _LOGGER.info('Devices in coordinator: %s', str(coordinator._devices))
-    _LOGGER.info('Data in coordinator: %s', str(coordinator.data))
+    #_LOGGER.info('Devices in coordinator: %s', str(coordinator._devices))
+    #_LOGGER.info('Data in coordinator: %s', str(coordinator.data))
 
-    if not coordinator.last_update_success:
-        _LOGGER.error("Error synchronizing coordinator")
-        raise ConfigEntryNotReady
+    #if not coordinator.last_update_success:
+    #    _LOGGER.error("Error synchronizing coordinator")
+    #    raise ConfigEntryNotReady
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    #hass.data[DOMAIN][entry.entry_id] = coordinator
 
-    _LOGGER.info("Setting entries up")
+    #_LOGGER.info("Setting entries up")
     
-    device_registry = dr.async_get(hass)
+    #device_registry = dr.async_get(hass)
 
-    for device in coordinator._devices:
-        platforms = PLATFORMS
-        device_registry.async_get_or_create(
-            config_entry_id = entry.entry_id,
-            identifiers = {(DOMAIN, device["deviceId"])},
-            manufacturer = NAME,
-            name = f'{NAME} - {device["productName"]}',
-            model = device["model"],
-            name_by_user = device["nickname"],
-        )
-        _LOGGER.info(
-            f"Humidifier {device['nickname']} registered successfully."
-        )
-        main_platform = device["productType"]
-        platforms.append(main_platform)
-        for platform in platforms:
-            if entry.options.get(platform, False):
-                continue
-            coordinator._platforms.append(platform)
+    #for device in coordinator._devices:
+    #    platforms = PLATFORMS
+    #    device_registry.async_get_or_create(
+    #        config_entry_id = entry.entry_id,
+    #        identifiers = {(DOMAIN, device["deviceId"])},
+    #        manufacturer = NAME,
+    #        name = f'{NAME} - {device["productName"]}',
+    #        model = device["model"],
+    #        name_by_user = device["nickname"],
+    #    )
+    #    _LOGGER.info(
+    #        f"Humidifier {device['nickname']} registered successfully."
+    #    )
+    #    main_platform = device["productType"]
+    #    platforms.append(main_platform)
+    #    for platform in platforms:
+    #        if entry.options.get(platform, False):
+    #            continue
+    #        coordinator._platforms.append(platform)
 
     
         
@@ -116,3 +117,8 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload config entry."""
     await async_unload_entry(hass, entry)
     await async_setup_entry(hass, entry)
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: ConfigEntry, device_entry: DeviceEntry
+) -> bool:
+    """Remove a config entry from a device."""

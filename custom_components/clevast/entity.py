@@ -1,7 +1,5 @@
 """ClevastEntity class"""
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.components.humidifier import HumidifierEntity
-from homeassistant.core import callback
 
 from .const import ATTRIBUTION
 from .const import DOMAIN
