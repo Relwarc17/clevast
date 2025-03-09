@@ -83,8 +83,10 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
 
     async def async_set_humidity(self, humidity: int) -> None:
         if humidity < self._attr_min_humidity or humidity > self._attr_max_humidity:
+            _LOGGER.error("Humidity %d not in range", humidity)
             return
         args = f'{"humidity":{humidity}}'
+        _LOGGER.info("Setting target humidity to %d", humidity)
         await self._coordinator._my_api.sync_data(self._idx, args)
         await self._coordinator.async_request_refresh()
 
