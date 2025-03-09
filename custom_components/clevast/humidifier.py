@@ -84,7 +84,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
     async def async_set_humidity(self, humidity: int) -> None:
         if humidity < self._attr_min_humidity or humidity > self._attr_max_humidity:
             return
-        args = f'{{"humidity":{humidity}}'
+        args = f'{"humidity":{humidity}}'
         await self._coordinator._my_api.sync_data(self._idx, args)
         await self._coordinator.async_request_refresh()
 
