@@ -123,7 +123,7 @@ class ClevastApiClient:
         try:
             async with async_timeout.timeout(TIMEOUT):
                 if method == "get":
-                    response = await self._session.get(url, params=data, headers=headers, proxy="http://192.168.178.62:8080", ssl=False)
+                    response = await self._session.get(url, params=data, headers=headers)
                     #return await response.json()
 
                 elif method == "put":
@@ -133,7 +133,7 @@ class ClevastApiClient:
                     response = await self._session.patch(url, headers=headers, json=data)
 
                 elif method == "post":
-                    response = await self._session.post(url, headers=headers, json=data, proxy="http://192.168.178.62:8080", ssl=False)
+                    response = await self._session.post(url, headers=headers, json=data)
                     #return await response.json()
                 return await response.json()
         except asyncio.TimeoutError as exception:
