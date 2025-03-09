@@ -39,6 +39,7 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
             always_update = False
         )
         _LOGGER.info("Initializing Cordinator")
+        self._platforms = []
         self._my_api = my_api
         self._devices: ClevastDevices | list = list
 
