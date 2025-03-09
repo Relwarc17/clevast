@@ -40,6 +40,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     #
     await coordinator.async_config_entry_first_refresh()
 
+    _LOGGER.info('Devices in coordinator: %s', str(coordinator._devices))
+    _LOGGER.info('Data in coordinator: %s', str(coordinator.data))
+
     async_add_entities(
         ClevastHumidifier(coordinator, idx) for idx, ent in enumerate(coordinator.data)
     )
@@ -97,6 +100,7 @@ class MyCoordinator(DataUpdateCoordinator):
                 listening_idx = set(self.async_contexts())
                 _LOGGER.info("Listening idx: %s", listening_idx)
                 #return await self.my_api.fetch_data(listening_idx)
+                listening_idx = self._devices[0]["deviceId"]
                 return await self._my_api.get_device_data(listening_idx)
         except Exception as exception:
             raise UpdateFailed() from exception
