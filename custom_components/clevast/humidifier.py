@@ -60,18 +60,18 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
     @property
     def is_on(self):
         """Return true if the switch is on."""
-        return self._coordinator.data.get("status", 0) == 1
+        return self._coordinator.data.get("work_state", 0) == 1
 
     @property
-    def get_current_humidity(self) -> float | None:
+    def current_humidity(self) -> float | None:
         return cast("float", self._coordinator.data.get("current_humidity", 0))
     
     @property
-    def get_current_mist_level(self) -> float | None:
+    def current_mist_level(self) -> float | None:
         return cast("float", self._coordinator.data.get("mist_level", 0))
 
     @property
-    def get_target_humidity(self) -> float:
+    def target_humidity(self) -> float:
         return cast("float", self._coordinator.data.get("humidity", 0))
 
     async def async_set_mist_level(self, mist_level: int) -> None:
@@ -113,7 +113,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_is_on = self._coordinator.data.get("status", 0) 
+        self._attr_is_on = self._coordinator.data.get("work_state", 0) 
         self.async_write_ha_state()
 
        

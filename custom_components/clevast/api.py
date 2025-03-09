@@ -107,7 +107,7 @@ class ClevastApiClient:
         }
         response =  await self.api_wrapper("post", url, data=dev_data, headers=HEADERS)
         _LOGGER.info("POST sync data Response: %s", json.dumps(response, indent=2))
-        if "message" in response and "message" != "Success":
+        if "message" in response and response["message"] != "Success":
             _LOGGER.error(response["message"])
 
 
