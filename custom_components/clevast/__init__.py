@@ -34,10 +34,24 @@ SCAN_INTERVAL = timedelta(seconds=30)
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
+async def async_setup(hass, config):
+    # Return boolean to indicate that initialization was successful.
+    return True
+
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Config entry example."""
-    # assuming API object stored here by __init__.py
-    my_api = hass.data[DOMAIN][config_entry.entry_id]
+
+    """Set up this integration using UI."""
+    if hass.data.get(DOMAIN) is None:
+        hass.data.setdefault(DOMAIN, {})
+        _LOGGER.info(STARTUP_MESSAGE)
+
+    username = config_entry.data.get(CONF_USERNAME)
+    password = config_entry.data.get(CONF_PASSWORD)
+
+    session = async_get_clientsession(hass)
+    my_api = ClevastApiClient(username, password, session)
+
     coordinator = ClevastDataUpdateCoordinator(hass, config_entry, my_api)
 
     # Fetch initial data so we have data when entities subscribe
@@ -54,38 +68,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(
         ClevastEntity(coordinator, idx) for idx, ent in enumerate(coordinator.data)
     )
-
-
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    """Set up this integration using UI."""
-    if hass.data.get(DOMAIN) is None:
-        hass.data.setdefault(DOMAIN, {})
-        _LOGGER.info(STARTUP_MESSAGE)
-
-    username = entry.data.get(CONF_USERNAME)
-    password = entry.data.get(CONF_PASSWORD)
-
-    session = async_get_clientsession(hass)
-    client = ClevastApiClient(username, password, session)
-    hass.data[DOMAIN][entry.entry_id] = client
-    coordinator = ClevastDataUpdateCoordinator(hass, entry)
-    await coordinator.async_refresh()
-
-    if not coordinator.last_update_success:
-        raise ConfigEntryNotReady
-
-    devices: ClevastDevices = client.get_devices()
-    for device in devices:
-       dev = ClevastDeviceInfo(device)
-    #for platform in PLATFORMS:
-    #    if entry.options.get(platform, True):
-    #        coordinator._platforms.append(platform)
-    #        hass.async_add_job(
-    #            await hass.config_entries.async_forward_entry_setups(entry, platform)
-    #        )
-
-    entry.add_update_listener(async_reload_entry)
-    return True
+    config_entry.add_update_listener(async_reload_entry)
+    return True 
 
 
 
