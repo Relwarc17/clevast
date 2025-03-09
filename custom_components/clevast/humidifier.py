@@ -1,12 +1,12 @@
 """ClevastEntity class"""
+from .entity import ClevastEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.components.humidifier import HumidifierEntity
 from homeassistant.core import callback
 
-from .const import ATTRIBUTION
+
 from .const import DOMAIN
-from .const import NAME
-from .const import VERSION
+from .const import ICON
 
 import logging
 
@@ -15,36 +15,24 @@ _LOGGER: logging.Logger = logging.getLogger(__package__)
 async def async_setup_entry(hass, entry, async_add_devices):
     """Setup sensor platform."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    _LOGGER.info(entry)
     async_add_devices([ClevastHumidifier(coordinator, entry)])
 
-class ClevastHumidifier(HumidifierEntity):
-    def __init__(self, coordinator, config_entry):
-        super().__init__(coordinator, config_entry)
-        self.config_entry = config_entry
+class ClevastHumidifier(ClevastEntity, HumidifierEntity):
 
     @property
-    def unique_id(self):
-        """Return a unique ID to use for this entity."""
-        return self.config_entry.entry_id
+    def name(self):
+        """Return the name of the switch."""
+        return f"{DEFAULT_NAME}_{SWITCH}"
 
     @property
-    def device_info(self):
-        return {
-            "identifiers": {(DOMAIN, self.unique_id)},
-            "name": NAME,
-            "model": "ASDASDASDAsd",
-            "manufacturer": NAME,
-        }
+    def icon(self):
+        """Return the icon of this switch."""
+        return ICON
 
     @property
-    def device_state_attributes(self):
-        """Return the state attributes."""
-        return {
-            "attribution": ATTRIBUTION,
-            "id": str(self.coordinator.data.get("id")),
-            "integration": DOMAIN,
-        }
+    def is_on(self):
+        """Return true if the switch is on."""
+        return self.coordinator.data.get("title", "") == "foo"
     
     async def async_set_mode(self, mode):
         """Set new target preset mode."""

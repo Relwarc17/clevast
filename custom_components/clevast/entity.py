@@ -9,7 +9,7 @@ from .const import NAME
 from .const import VERSION
 
 
-class ClevastEntity(CoordinatorEntity, HumidifierEntity):
+class ClevastEntity(CoordinatorEntity):
     """An entity using CoordinatorEntity.
 
     The CoordinatorEntity class provides:
@@ -20,8 +20,7 @@ class ClevastEntity(CoordinatorEntity, HumidifierEntity):
 
     """
     def __init__(self, coordinator, config_entry):
-        """Pass coordinator to CoordinatorEntity."""
-        super().__init__(coordinator, config_entry)
+        super().__init__(coordinator)
         self.config_entry = config_entry
 
     @property
@@ -34,7 +33,7 @@ class ClevastEntity(CoordinatorEntity, HumidifierEntity):
         return {
             "identifiers": {(DOMAIN, self.unique_id)},
             "name": NAME,
-            "model": self.config_entry.model,
+            "model": VERSION,
             "manufacturer": NAME,
         }
 
@@ -46,55 +45,5 @@ class ClevastEntity(CoordinatorEntity, HumidifierEntity):
             "id": str(self.coordinator.data.get("id")),
             "integration": DOMAIN,
         }
-
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        self._attr_is_on = self.coordinator.data[self.idx]["state"]
-        self.async_write_ha_state()
-
-    async def set_mode(self, mode):
-        """Set new target preset mode."""
-         # Do the turning off.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
-
-
-    async def set_humidity(self, humidity):
-        """Set new target humidity."""
-         # Do the turning off.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
-
-    async def turn_on(self, **kwargs):
-        """Turn the device on."""
-         # Do the turning on.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
-
-    async def turn_off(self, **kwargs):
-        """Turn the device off."""
-         # Do the turning off.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
-
-    async def async_turn_on(self, **kwargs):
-        """Turn the light on.
-
-        Example method how to request data updates.
-        """
-        # Do the turning on.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
 
        

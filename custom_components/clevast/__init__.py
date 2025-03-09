@@ -15,11 +15,13 @@ from homeassistant.core_config import Config
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers import device_registry as dr
 
 from .api import ClevastApiClient
 from .const import CONF_PASSWORD
 from .const import CONF_USERNAME
 from .const import DOMAIN
+from .const import NAME
 from .const import PLATFORMS
 from .const import STARTUP_MESSAGE
 
@@ -58,12 +60,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
     _LOGGER.info("Setting entries up")
-    for platform in PLATFORMS:
-        if entry.options.get(platform, True):
+    
+    device_registry = await dr.async_get(hass)
+
+    for device in coordinator._devices:
+        platforms = PLATFORMS
+        device_registry.async_get_or_create(
+            config_entry_id = entry.entry_id,
+            identifiers = {(DOMAIN, device["deviceId"])},
+            manufacturer = NAME,
+            name = device["deviceName"],
+            model = device["model"],
+            name_by_user = device["nickname"],
+        )
+        _LOGGER.info(
+            f"Humidifier {device['nickname']} registered successfully."
+        )
+        main_platform = device["productType"]
+        platforms.append(main_platform)
+        for platform in platforms:
+            if entry.options.get(platform, False):
+                continue
             coordinator._platforms.append(platform)
-            hass.async_add_job(
-                await hass.config_entries.async_forward_entry_setup(entry, platform)
-            )
+
+    
+        
 
     entry.add_update_listener(async_reload_entry)
     return True
