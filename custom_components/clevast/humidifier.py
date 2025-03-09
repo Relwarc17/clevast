@@ -66,6 +66,7 @@ class MyCoordinator(DataUpdateCoordinator):
         _LOGGER.info("Initializing Cordinator")
         self._platforms = []
         self._my_api = my_api
+        self._config_entry = config_entry
         self._devices: ClevastDevices | list = list
 
     async def _async_setup(self) -> None:
@@ -105,11 +106,13 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
 
     def __init__(self, coordinator, idx):
         super().__init__(coordinator, context=idx)
+        self._coordinator = coordinator
+        self.idx = idx
         
     @property
     def unique_id(self):
         """Return a unique ID to use for this entity."""
-        return self.config_entry.entry_id
+        return self._coordinator.config_entry.entry_id
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -131,7 +134,7 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
         """Return the state attributes."""
         return {
             "attribution": ATTRIBUTION,
-            "id": str(self.coordinator.data.get("id")),
+            "id": str(self._coordinator.data.get("id")),
             "integration": DOMAIN,
         }
 
@@ -146,7 +149,7 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
     @property
     def is_on(self):
         """Return true if the switch is on."""
-        return self.coordinator.data.get("title", "") == "foo"
+        return self._coordinator.data.get("title", "") == "foo"
     
     async def async_set_mode(self, mode):
         """Set new target preset mode."""
@@ -165,7 +168,7 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
         # ...
 
         # Update the data
-        await self.coordinator.async_request_refresh()
+        await self._coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
         """Turn the device off."""
@@ -174,5 +177,5 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_is_on = self.coordinator.data[self.config_entry]["state"]
+        self._attr_is_on = self._coordinator.data[self.idx]["state"]
         self.async_write_ha_state()

@@ -24,7 +24,7 @@ class ClevastEntity(CoordinatorEntity):
         self._device_name = None  # To store the dynamic deviceName
         self._state = None
         self._available = True
-        self._device_type = device_type
+        self._device_type = "Humidifier"
 
     @property
     def unique_id(self):
