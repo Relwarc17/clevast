@@ -133,7 +133,7 @@ class ClevastApiClient:
                     response = await self._session.patch(url, headers=headers, json=data)
 
                 elif method == "post":
-                    response = await self._session.post(url, headers=headers, json=data)
+                    response = await self._session.post(url, headers=headers, json=data, proxy="http://192.168.178.62:8080", ssl=False)
                     #return await response.json()
                 return await response.json()
         except asyncio.TimeoutError as exception:
