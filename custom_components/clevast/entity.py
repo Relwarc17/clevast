@@ -32,7 +32,7 @@ class ClevastEntity(CoordinatorEntity):
         return (
             f"{self._config_entry.entry_id}_switch_{self._device_id}"
             if self._device_id
-            else f"{self._entry_id}_switch_{self._device_type}"
+            else f"{self._config_entry._entry_id}_switch_{self._device_type}"
         )
 
     @property

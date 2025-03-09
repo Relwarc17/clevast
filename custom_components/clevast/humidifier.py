@@ -107,7 +107,7 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
     def __init__(self, coordinator, idx):
         super().__init__(coordinator, context=idx)
         self._coordinator = coordinator
-        self.idx = idx
+        self._idx = idx
         
     @property
     def unique_id(self):
@@ -124,9 +124,9 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
             },
             name = self.name,
             manufacturer = NAME,
-            model = self.light.productname,
-            model_id = self.light.modelid,
-            sw_version = self.light.swversion,
+            model = self._coordinator._devices[0].model,
+            model_id = self._coordinator._devices[0].deviceId,
+            sw_version = "0.0.0",
         )
 
     @property
@@ -177,5 +177,5 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_is_on = self._coordinator.data[self.idx]["state"]
+        self._attr_is_on = self._coordinator.data[self._idx]["state"]
         self.async_write_ha_state()
