@@ -1,6 +1,6 @@
 """Adds config flow for Clevast."""
 import voluptuous as vol
-from homeassistant import config_entries
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow, CONN_CLASS_CLOUD_POLL
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 
@@ -11,15 +11,15 @@ from .const import DOMAIN
 from .const import PLATFORMS
 
 
-class ClevastFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+class ClevastFlowHandler(ConfigFlow, domain=DOMAIN):
     """Config flow for clevast."""
 
     VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
+    CONNECTION_CLASS = CONN_CLASS_CLOUD_POLL
 
-    def __init__(self):
-        """Initialize."""
-        self._errors = {}
+    @property
+    def errors(self) -> dict:
+        return dict()
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initialized by the user."""
@@ -45,7 +45,7 @@ class ClevastFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry):
+    def async_get_options_flow(config_entry: ConfigEntry):
         return ClevastOptionsFlowHandler()
 
     async def _show_config_form(self, user_input):  # pylint: disable=unused-argument
@@ -70,13 +70,13 @@ class ClevastFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         return False
 
 
-class ClevastOptionsFlowHandler(config_entries.OptionsFlow):
+class ClevastOptionsFlowHandler(OptionsFlow):
     """Config flow options handler for clevast."""
 
-    def __init__(self):
-        """Initialize HACS options flow."""
-        #self.config_entry = config_entry
-        self.options = dict(self.config_entry.options)
+
+    @property
+    def options(self) -> dict:
+        return dict(self.config_entry.options)
     
     @property
     def config_entry(self):

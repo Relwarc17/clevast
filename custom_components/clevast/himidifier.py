@@ -19,6 +19,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from .const import DOMAIN
 from .const import NAME
 from .const import ICON
+from .const import ATTRIBUTION
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
@@ -116,14 +117,13 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
         return DeviceInfo(
             identifiers={
                 # Serial numbers are unique identifiers within a specific domain
-                (hue.DOMAIN, self.unique_id)
+                (DOMAIN, self.unique_id)
             },
-            name=self.name,
-            manufacturer=self.light.manufacturername,
-            model=self.light.productname,
-            model_id=self.light.modelid,
-            sw_version=self.light.swversion,
-            via_device=(hue.DOMAIN, self.api.bridgeid),
+            name = self.name,
+            manufacturer = NAME,
+            model = self.light.productname,
+            model_id = self.light.modelid,
+            sw_version = self.light.swversion,
         )
 
     @property
