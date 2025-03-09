@@ -25,7 +25,7 @@ class ClevastEntity(CoordinatorEntity):
         self._state = None
         self._available = True
         self._device_type = coordinator._devices[0]["productType"].capitalize()
-        self._coordinaor = coordinator
+        self._coordinator = coordinator
         self._idx = idx
 
     @property
@@ -53,7 +53,7 @@ class ClevastEntity(CoordinatorEntity):
         """Return the state attributes."""
         return {
             "attribution": ATTRIBUTION,
-            "id": str(self.coordinator.data.get("id")),
+            "id": str(self._coordinator.data.get("id")),
             "integration": DOMAIN,
         }
 
