@@ -6,21 +6,15 @@ https://github.com/Relwarc17/clevast
 """
 import asyncio
 import logging
-import json
 from datetime import timedelta
 
 from .coordinator import ClevastDataUpdateCoordinator
 
-from .humidifier import ClevastEntity
-
-from .clevast_device import ClevastDeviceInfo, ClevastDevices
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core_config import Config
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from .api import ClevastApiClient
 from .const import CONF_PASSWORD
@@ -68,7 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         if entry.options.get(platform, True):
             coordinator._platforms.append(platform)
             hass.async_add_job(
-                hass.config_entries.async_forward_entry_setup(entry, platform)
+                await hass.config_entries.async_forward_entry_setup(entry, platform)
             )
 
     entry.add_update_listener(async_reload_entry)
