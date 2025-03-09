@@ -29,25 +29,24 @@ class ClevastFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         if self._async_current_entries():
             return self.async_abort(reason="single_instance_allowed")
 
-        if user_input is not None:
-            valid = await self._test_credentials(
-                user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
-            )
-            if valid:
-                return self.async_create_entry(
-                    title=user_input[CONF_USERNAME], data=user_input
-                )
-            else:
-                self._errors["base"] = "auth"
-
+        if user_input is None:
             return await self._show_config_form(user_input)
-
+        
+        valid = await self._test_credentials(
+            user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+        )
+        if valid:
+            return self.async_create_entry(
+                title=user_input[CONF_USERNAME], data=user_input
+            )
+        
+        self._errors["base"] = "auth"
         return await self._show_config_form(user_input)
 
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
-        return ClevastOptionsFlowHandler(config_entry)
+        return ClevastOptionsFlowHandler()
 
     async def _show_config_form(self, user_input):  # pylint: disable=unused-argument
         """Show the configuration form to edit location data."""
@@ -74,10 +73,15 @@ class ClevastFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
 class ClevastOptionsFlowHandler(config_entries.OptionsFlow):
     """Config flow options handler for clevast."""
 
-    def __init__(self, config_entry):
+    def __init__(self):
         """Initialize HACS options flow."""
-        self.config_entry = config_entry
-        self.options = dict(config_entry.options)
+        #self.config_entry = config_entry
+        self.options = dict(self.config_entry.options)
+    
+    @property
+    def config_entry(self):
+        return self.hass.config_entries.async_get_entry(self.handler)
+
 
     async def async_step_init(self, user_input=None):  # pylint: disable=unused-argument
         """Manage the options."""

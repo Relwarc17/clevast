@@ -8,19 +8,18 @@ from .const import DOMAIN
 from .const import NAME
 from .const import VERSION
 
+import logging
 
-class ClevastEntity(CoordinatorEntity, HumidifierEntity):
-    """An entity using CoordinatorEntity.
+_LOGGER: logging.Logger = logging.getLogger(__package__)
 
-    The CoordinatorEntity class provides:
-      should_poll
-      async_update
-      async_added_to_hass
-      available
+async def async_setup_entry(hass, entry, async_add_devices):
+    """Setup sensor platform."""
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    _LOGGER.info(entry)
+    async_add_devices([ClevastHumidifier(coordinator, entry)])
 
-    """
+class ClevastHumidifier(HumidifierEntity):
     def __init__(self, coordinator, config_entry):
-        """Pass coordinator to CoordinatorEntity."""
         super().__init__(coordinator, config_entry)
         self.config_entry = config_entry
 
@@ -34,7 +33,7 @@ class ClevastEntity(CoordinatorEntity, HumidifierEntity):
         return {
             "identifiers": {(DOMAIN, self.unique_id)},
             "name": NAME,
-            "model": self.config_entry.model,
+            "model": "ASDASDASDAsd",
             "manufacturer": NAME,
         }
 
@@ -46,55 +45,27 @@ class ClevastEntity(CoordinatorEntity, HumidifierEntity):
             "id": str(self.coordinator.data.get("id")),
             "integration": DOMAIN,
         }
+    
+    async def async_set_mode(self, mode):
+        """Set new target preset mode."""
+        return True
+
+    async def async_set_humidity(self, humidity):
+        """Set new target humidity."""
+        return True
+    
+    async def async_turn_on(self, **kwargs):
+        """Turn the device on."""
+        return True
+
+    async def async_turn_off(self, **kwargs):
+        """Turn the device off."""
+        return True
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_is_on = self.coordinator.data[self.idx]["state"]
+        self._attr_is_on = self.coordinator.data[self.config_entry]["state"]
         self.async_write_ha_state()
-
-    async def set_mode(self, mode):
-        """Set new target preset mode."""
-         # Do the turning off.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
-
-
-    async def set_humidity(self, humidity):
-        """Set new target humidity."""
-         # Do the turning off.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
-
-    async def turn_on(self, **kwargs):
-        """Turn the device on."""
-         # Do the turning on.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
-
-    async def turn_off(self, **kwargs):
-        """Turn the device off."""
-         # Do the turning off.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
-
-    async def async_turn_on(self, **kwargs):
-        """Turn the light on.
-
-        Example method how to request data updates.
-        """
-        # Do the turning on.
-        # ...
-
-        # Update the data
-        await self.coordinator.async_request_refresh()
 
        
