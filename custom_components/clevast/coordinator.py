@@ -38,7 +38,8 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
             # being dispatched to listeners
             always_update = False
         )
-        self.my_api = my_api
+        _LOGGER.info("Initializing Cordinator")
+        self._my_api = my_api
         self._devices: ClevastDevices | list = list
 
     async def _async_setup(self):
@@ -50,7 +51,8 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
         This method will be called automatically during
         coordinator.async_config_entry_first_refresh.
         """
-        self._devices = await self.my_api.get_devices()
+        _LOGGER.info("Cordinator _async_setup")
+        self._devices = await self._my_api.get_devices()
 
     async def _async_update_data(self):
         """Fetch data from API endpoint.
@@ -62,10 +64,11 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
         try:
 
             async with async_timeout.timeout(10):
-                await self._api.login()
+                await self._my_api.login()
                 listening_idx = set(self.async_contexts())
+                _LOGGER.info(listening_idx)
                 #return await self.my_api.fetch_data(listening_idx)
-                return await self._api.get_devices()
+                return await self._my_api.get_devices()
         except Exception as exception:
             raise UpdateFailed() from exception
 

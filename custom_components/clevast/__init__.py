@@ -47,17 +47,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     username = entry.data.get(CONF_USERNAME)
     password = entry.data.get(CONF_PASSWORD)
 
+
+    _LOGGER.info("Creating session")
     session = async_get_clientsession(hass)
     my_api = ClevastApiClient(username, password, session)
 
+    _LOGGER.info("Creating cordinator")
     coordinator = ClevastDataUpdateCoordinator(hass, entry, my_api)
+    _LOGGER.info("Sync coordinator")
     await coordinator.async_refresh()
 
     if not coordinator.last_update_success:
+        _LOGGER.error("Error synchronizing coordinator")
         raise ConfigEntryNotReady
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
+    _LOGGER.info("Setting entries up")
     for platform in PLATFORMS:
         if entry.options.get(platform, True):
             coordinator.platforms.append(platform)
