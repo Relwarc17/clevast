@@ -38,7 +38,7 @@ class ClevastSensor(ClevastEntity, SensorEntity):
 
     def __init__(self, coordinator, idx) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator, context=idx)
+        super().__init__(coordinator, idx)
         self.unique_id += "-humidity"
         self.entity_id = f"sensor.{self.entity_id_base}_humidity"
 

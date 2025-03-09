@@ -34,7 +34,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class ClevastHumidifier(ClevastEntity, HumidifierEntity):
 
     def __init__(self, coordinator, idx):
-        super().__init__(coordinator, context=idx)
+        super().__init__(coordinator, idx)
         #self._coordinator = coordinator
         #self._idx = idx
         self._attr_min_humidity: float = 40

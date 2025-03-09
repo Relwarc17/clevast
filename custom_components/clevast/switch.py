@@ -26,7 +26,7 @@ class ClevastSwitch(ClevastEntity, SwitchEntity):
     """clevast switch class."""
 
     def __init__(self, coordinator, idx):
-        super().__init__(coordinator, context=idx)
+        super().__init__(coordinator, idx)
         self.unique_id += "-switch"
         self.entity_id = f"switch.{self.entity_id_base}_humidity"
 

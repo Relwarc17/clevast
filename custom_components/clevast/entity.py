@@ -19,7 +19,7 @@ class ClevastEntity(CoordinatorEntity):
 
     """
     def __init__(self, coordinator, idx):
-        super().__init__(coordinator)
+        super().__init__(coordinator, context=idx)
         self._device_id = coordinator._devices[0]["deviceId"]
         self._device_name = coordinator._devices[0]["nickname"]
         self._state = None
