@@ -8,6 +8,8 @@ import asyncio
 import logging
 from datetime import timedelta
 
+from .clevast_device import ClevastDevices, ClevastDeviceInfo
+
 from .coordinator import ClevastDataUpdateCoordinator
 
 from homeassistant.config_entries import ConfigEntry
@@ -15,6 +17,7 @@ from homeassistant.core_config import Config
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.exceptions import ConfigEntryNotReady
 
 from .api import ClevastApiClient
 from .const import CONF_PASSWORD
@@ -47,27 +50,31 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     session = async_get_clientsession(hass)
     my_api = ClevastApiClient(username, password, session)
 
-    hass.data[DOMAIN][entry.entry_id] = my_api
+    # hass.data[DOMAIN][entry.entry_id] = my_api
 
-    #_LOGGER.info("Creating cordinator")
-    #coordinator = ClevastDataUpdateCoordinator(hass, entry, my_api)
-    #_LOGGER.info("Sync coordinator")
+    # _LOGGER.info("Creating cordinator")
+    coordinator = ClevastDataUpdateCoordinator(hass, entry, my_api)
+    # _LOGGER.info("Sync coordinator")
 
-    #await coordinator.async_config_entry_first_refresh()
+    await coordinator.async_config_entry_first_refresh()
     # await coordinator.async_refresh()
 
-    #_LOGGER.info('Devices in coordinator: %s', str(coordinator._devices))
-    #_LOGGER.info('Data in coordinator: %s', str(coordinator.data))
+    _LOGGER.info('Devices in coordinator: %s', str(coordinator._devices))
+    _LOGGER.info('Data in coordinator: %s', str(coordinator.data))
 
-    #if not coordinator.last_update_success:
-    #    _LOGGER.error("Error synchronizing coordinator")
-    #    raise ConfigEntryNotReady
+    if not coordinator.last_update_success:
+        _LOGGER.error("Error synchronizing coordinator")
+        raise ConfigEntryNotReady
 
-    #hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN][entry.entry_id] = coordinator
 
-    #_LOGGER.info("Setting entries up")
+    _LOGGER.info("Setting entries up")
     
     #device_registry = dr.async_get(hass)
+    
+    #devices = ClevastDevices()
+    #for device in coordinator._devices:
+    #    d: ClevastDeviceInfo = my_api.get_device_data(device['deviceId'])
 
     #for device in coordinator._devices:
     #    platforms = PLATFORMS

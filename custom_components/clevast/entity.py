@@ -1,5 +1,6 @@
 """ClevastEntity class"""
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import ATTRIBUTION
 from .const import DOMAIN
@@ -17,45 +18,35 @@ class ClevastEntity(CoordinatorEntity):
       available
 
     """
-    def __init__(self, coordinator, config_entry):
-        super().__init__(coordinator)
-        self._config_entry = config_entry
+    def __init__(self, coordinator, idx):
+        super().__init__(coordinator, context=idx)
         self._device_id = coordinator._devices[0]["deviceId"]
         self._device_name = coordinator._devices[0]["nickname"]
         self._state = None
         self._available = True
         self._device_type = coordinator._devices[0]["productType"].capitalize()
         self._coordinaor = coordinator
+        self._idx = idx
 
     @property
     def unique_id(self):
         """Return a unique ID for the switch."""
-        return (
-            f"{self._config_entry.entry_id}_switch_{self._device_id}"
-            if self._device_id
-            else f"{self._config_entry.entry_id}_switch_{self._device_type}"
-        )
+        return self._idx
 
     @property
-    def device_info(self):
-        """Return device information for linking with the device registry."""
-        if not self._device_id or not self._device_name:
-            return None
-
-        return {
-            "identifiers": {
-                (DOMAIN, self._device_id)
-            },  # Match the registered device ID
-            "name": self._device_name,  # Use the dynamic deviceName
-            "manufacturer": NAME,
-            "model": f"Mars Hydro {self._device_type}",
-        }
-        return {
-            "identifiers": {(DOMAIN, self.unique_id)},
-            "name": NAME,
-            "model": VERSION,
-            "manufacturer": NAME,
-        }
+    def device_info(self) -> DeviceInfo:
+        """Return the device info."""
+        return DeviceInfo(
+            identifiers={
+                # Serial numbers are unique identifiers within a specific domain
+                (DOMAIN, self.unique_id)
+            },
+            name = self._device_name | "{NAME} - Humidifier - hardoced",
+            manufacturer = NAME,
+            model = self._coordinator._devices[0]["model"],
+            model_id = self._coordinator._devices[0]["deviceId"],
+            sw_version = str(self.coordinator.data.get("version")),
+        )
 
     @property
     def device_state_attributes(self):

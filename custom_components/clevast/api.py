@@ -74,12 +74,25 @@ class ClevastApiClient:
             return list()
         return response["result"]
     
+    async def get_device_info(self, device_id) -> dict:
+        url = f"{self._baseurl}/clevast/api/device/info/{device_id}"
+        return await self.api_wrapper("get", url, data={}, headers=HEADERS)
     
     async def get_device_data(self, device_id) -> dict:
+        url = f"{self._baseurl}/clevast/api/device/manage/sync/get"
+        params = {
+            "deviceId": device_id,
+            "identifier": "sys_all"
+        }
+        return await self.api_wrapper("get", url, data=params, headers=HEADERS)
+
+
+    async def sync_data(self, device_id, args: str) -> dict:
         """Get data from the API."""
         url = f"{self._baseurl}/clevast/api/device/manage/async/set"
         dev_data = {
-            "args": "{\"state_synch\":1}",
+            #"args": "{\"state_synch\":1}",
+            "args": args,
             "deviceId": device_id
         }
         return await self.api_wrapper("post", url, data=dev_data, headers=HEADERS)
@@ -101,7 +114,7 @@ class ClevastApiClient:
         try:
             async with async_timeout.timeout(TIMEOUT):
                 if method == "get":
-                    response = await self._session.get(url, headers=headers)
+                    response = await self._session.get(url, params=data, headers=headers)
                     #return await response.json()
 
                 elif method == "put":

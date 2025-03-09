@@ -1,122 +1,53 @@
-"""Example integration using DataUpdateCoordinator."""
+"""ClevastEntity class"""
 
-from datetime import timedelta
-import logging
-
-import async_timeout
-
-from .clevast_device import ClevastDevices
-
-from homeassistant.components.humidifier import HumidifierEntity
-from homeassistant.core import callback
-from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
-    DataUpdateCoordinator,
-    UpdateFailed,
+from typing import Any, cast
+from .entity import ClevastEntity
+from homeassistant.components.humidifier import (
+    HumidifierDeviceClass,
+    HumidifierEntity,
+    HumidifierEntityFeature,
 )
-from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.core import callback
+
 
 from .const import DOMAIN
 from .const import NAME
 from .const import ICON
-from .const import ATTRIBUTION
+
+import logging
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
-
-async def async_setup_entry(hass, config_entry, async_add_entities):
-    """Config entry example."""
-    # assuming API object stored here by __init__.py
-    my_api = hass.data[DOMAIN][config_entry.entry_id]
-    coordinator = MyCoordinator(hass, config_entry, my_api)
-
-    # Fetch initial data so we have data when entities subscribe
-    #
-    # If the refresh fails, async_config_entry_first_refresh will
-    # raise ConfigEntryNotReady and setup will try again later
-    #
-    # If you do not want to retry setup on failure, use
-    # coordinator.async_refresh() instead
-    #
-    await coordinator.async_config_entry_first_refresh()
-
-    _LOGGER.info('Devices in coordinator: %s', str(coordinator._devices))
-    _LOGGER.info('Data in coordinator: %s', str(coordinator.data))
-
-    async_add_entities(
-        ClevastHumidifier(coordinator, idx) for idx, ent in enumerate(coordinator.data)
-    )
-
-
-class MyCoordinator(DataUpdateCoordinator):
-    """My custom coordinator."""
-
-    def __init__(self, hass, config_entry, my_api):
-        """Initialize my coordinator."""
-        super().__init__(
-            hass,
-            _LOGGER,
-            # Name of the data. For logging purposes.
-            name = "Clevast - humidifier",
-            config_entry = config_entry,
-            # Polling interval. Will only be polled if there are subscribers.
-            update_interval = timedelta(seconds=30),
-            # Set always_update to `False` if the data returned from the
-            # api can be compared via `__eq__` to avoid duplicate updates
-            # being dispatched to listeners
-            always_update = False
+#async def async_setup_entry(hass, entry, async_add_devices):
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Setup sensor platform."""
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    #async_add_devices([ClevastHumidifier(coordinator, entry)])
+    for device in coordinator._devices:
+        if "productType" not in device or device["productType"] != "HUMIDIFIER":
+            continue
+        device["version"] = "2.0.11"
+        async_add_entities(
+            ClevastHumidifier(coordinator, device["deviceId"])
         )
-        _LOGGER.info("Initializing Cordinator")
-        self._platforms = []
-        self._my_api = my_api
-        self._config_entry = config_entry
-        self._devices: ClevastDevices | list = list
 
-    async def _async_setup(self) -> None:
-        """Set up the coordinator
-
-        This is the place to set up your coordinator,
-        or to load data, that only needs to be loaded once.
-
-        This method will be called automatically during
-        coordinator.async_config_entry_first_refresh.
-        """
-        _LOGGER.info("Cordinator _async_setup")
-        self._devices = await self._my_api.get_devices()
-
-
-    async def _async_update_data(self) -> ...:
-        """Fetch data from API endpoint.
-
-        This is the place to pre-process the data to lookup tables
-        so entities can quickly look up their data.
-        """
-        """Update data via library."""
-        try:
-            _LOGGER.info("Coordinator _async_update_data before async_timeout")
-            async with async_timeout.timeout(10):
-                _LOGGER.info("Coordinator _async_update_data after async_timeout")
-                await self._my_api.login()
-                listening_idx = set(self.async_contexts())
-                _LOGGER.info("Listening idx: %s", listening_idx)
-                #return await self.my_api.fetch_data(listening_idx)
-                listening_idx = self._devices[0]["deviceId"]
-                return await self._my_api.get_device_data(listening_idx)
-        except Exception as exception:
-            raise UpdateFailed() from exception
-
-
-class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
+class ClevastHumidifier(ClevastEntity, HumidifierEntity):
 
     def __init__(self, coordinator, idx):
         super().__init__(coordinator, context=idx)
-        self._coordinator = coordinator
-        self._idx = idx
-        
+        #self._coordinator = coordinator
+        #self._idx = idx
+        self._attr_min_humidity: float = 40
+        self._attr_max_humidity: float = 70
+        self._attr_min_mist_level: 1
+        self._attr_max_mist_level: 8
+        self._attr_device_class = HumidifierDeviceClass.HUMIDIFIER
+        self._attr_supported_features = HumidifierEntityFeature.MODES
+
     @property
     def unique_id(self):
         """Return a unique ID to use for this entity."""
-        return self._coordinator._devices[0]["deviceId"]
+        return self._idx
 
     @property
     def name(self):
@@ -129,58 +60,60 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
     @property
     def is_on(self):
         """Return true if the switch is on."""
-        return self._coordinator.data.get("title", "") == "foo"
+        return self._coordinator.data.get("status", 0) == 1
 
     @property
-    def device_info(self) -> DeviceInfo:
-        """Return the device info."""
-        return DeviceInfo(
-            identifiers={
-                # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self.unique_id)
-            },
-            name = self.name | "{NAME} - Humidifier - hardoced",
-            manufacturer = NAME,
-            model = self._coordinator._devices[0]["model"],
-            model_id = self._coordinator._devices[0]["deviceId"],
-            sw_version = "0.0.0",
-        )
+    def get_current_humidity(self) -> float | None:
+        return cast("float", self._coordinator.data.get("current_humidity", 0))
+    
+    @property
+    def get_current_mist_level(self) -> float | None:
+        return cast("float", self._coordinator.data.get("mist_level", 0))
 
     @property
-    def device_state_attributes(self):
-        """Return the state attributes."""
-        return {
-            "attribution": ATTRIBUTION,
-            "id": str(self._coordinator.data.get("id")),
-            "integration": DOMAIN,
-        }
+    def get_target_humidity(self) -> float:
+        return cast("float", self._coordinator.data.get("humidity", 0))
 
+    async def async_set_mist_level(self, mist_level: int) -> None:
+        if mist_level < self._attr_min_mist_level or mist_level > self._attr_max_mist_level:
+            return
+        c_h = self.get_current_humidity()
+        args = f'{{"humidity":{c_h},"switch":1,"mist_level":{mist_level}}}'
+        await self._coordinator._my_api.sync_data(self._idx, args)
+
+    async def async_set_humidity(self, humidity: int) -> None:
+        if humidity < self._attr_min_humidity or humidity > self._attr_max_humidity:
+            return
+        c_m_l = self.get_current_mist_level()
+        args = f'{{"humidity":{humidity},"switch":1,"mist_level":{c_m_l}}}'
+        await self._coordinator._my_api.sync_data(self._idx, args)
+
+    async def async_turn_on(self, **kwargs: Any) -> None:  
+        #c_m_l = self.get_current_mist_level()
+        #c_h = self.get_current_humidity()
+        #args = f'{{"humidity":{c_h},"switch":1,"mist_level":{c_m_l}}}'
+        args = '{"switch":1}'
+        self._coordinator._my_api.sync_data(self._idx, args)
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        args = '{"switch":0}'
+        await self._coordinator._my_api.sync_data(self._idx, args)
+
+    def update_state(self, status: Any) -> None:
+        """Midea Humidifier update state."""
+        if not self.hass:
+            _LOGGER.error("Humidifier update_state for %s [%s]", self.name, type(self))
+        self.schedule_update_ha_state()
     
     async def async_set_mode(self, mode):
         """Set new target preset mode."""
         return True
 
-    async def async_set_humidity(self, humidity):
-        """Set new target humidity."""
-        return True
-    
-    async def async_turn_on(self, **kwargs):
-        """Turn the light on.
-
-        Example method how to request data updates.
-        """
-        # Do the turning on.
-        # ...
-
-        # Update the data
-        await self._coordinator.async_request_refresh()
-
-    async def async_turn_off(self, **kwargs):
-        """Turn the device off."""
-        return True
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_is_on = self._coordinator.data[self._idx]["state"]
+        self._attr_is_on = self.coordinator.data[self.config_entry]["status"]
         self.async_write_ha_state()
+
+       

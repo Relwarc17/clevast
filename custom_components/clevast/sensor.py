@@ -14,10 +14,18 @@ from homeassistant.components.sensor import (
 )
 
 
-async def async_setup_entry(hass, entry, async_add_devices):
+#async def async_setup_entry(hass, entry, async_add_devices):
+async def async_setup_entry(hass, entry, async_add_entities):
     """Setup sensor platform."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_devices([ClevastSensor(coordinator, entry)])
+    #async_add_devices([ClevastSensor(coordinator, entry)])
+    for device in coordinator._devices:
+        if "productType" not in device or device["productType"] != "HUMIDIFIER":
+            continue
+        device["version"] = "2.0.11"
+        async_add_entities(
+            ClevastSensor(coordinator, device["deviceId"])
+        )
 
 
 class ClevastSensor(ClevastEntity, SensorEntity):
@@ -28,26 +36,21 @@ class ClevastSensor(ClevastEntity, SensorEntity):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = PERCENTAGE
 
-    def __init__(
-        self,
-        coordinator,
-        device,
-    ) -> None:
+    def __init__(self, coordinator, idx) -> None:
         """Initialize the sensor."""
-        super().__init__(coordinator, device)
-        assert self.unique_id is not None
+        super().__init__(coordinator, context=idx)
         self.unique_id += "-humidity"
         self.entity_id = f"sensor.{self.entity_id_base}_humidity"
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{DEFAULT_NAME}_humidity_{SENSOR}"
+        return f"{self._device_name}_humidity_{SENSOR}"
 
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self.coordinator.data.get("body")
+        return self.coordinator.data.get("status")
 
     @property
     def icon(self):
@@ -57,9 +60,9 @@ class ClevastSensor(ClevastEntity, SensorEntity):
     @property
     def device_class(self):
         """Return de device class of the sensor."""
-        return "clevast__custom_device_class"
+        return self._attr_device_class
     
     @property
     def native_value(self) -> int:
         """Return current environment humidity."""
-        return self.coordinator.data.state.environment_humidity
+        return self.coordinator.data.get("current_humidity")

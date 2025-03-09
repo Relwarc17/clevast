@@ -23,3 +23,21 @@ class ClevastDeviceInfo(TypedDict, total=False):
     lineDetection: str
     userId: int
     parentUserId: int
+    version: str
+    
+
+class ClevastDeviceData(TypedDict, total=False):
+    timing_plan: str
+    tone_switch: int
+    wifi_firmware_version: str
+    current_humidity: int
+    time_zone: str
+    mist_level: int
+    mcu_firmware_version: str
+    work_state: int
+    deviceLifeStatus: int
+    humidity: int 
+    get_onlinetime: str
+    time: int
+    remaining_work_time: int
+    status: int

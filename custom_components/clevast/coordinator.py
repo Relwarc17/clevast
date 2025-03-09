@@ -71,6 +71,8 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
                 listening_idx = set(self.async_contexts())
                 _LOGGER.info("Listening idx: %s", listening_idx)
                 #return await self.my_api.fetch_data(listening_idx)
+                args = '{"state_synch":1}'
+                await self._my_api.sync_data(listening_idx, args)
                 return await self._my_api.get_device_data(listening_idx)
         except Exception as exception:
             raise UpdateFailed() from exception
