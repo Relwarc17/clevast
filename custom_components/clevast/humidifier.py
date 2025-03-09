@@ -80,6 +80,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
         c_h = self.get_current_humidity()
         args = f'{{"humidity":{c_h},"switch":1,"mist_level":{mist_level}}}'
         await self._coordinator._my_api.sync_data(self._idx, args)
+        await self._coordinator.async_request_refresh()
 
     async def async_set_humidity(self, humidity: int) -> None:
         if humidity < self._attr_min_humidity or humidity > self._attr_max_humidity:
@@ -87,6 +88,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
         c_m_l = self.get_current_mist_level()
         args = f'{{"humidity":{humidity},"switch":1,"mist_level":{c_m_l}}}'
         await self._coordinator._my_api.sync_data(self._idx, args)
+        await self._coordinator.async_request_refresh()
 
     async def async_turn_on(self, **kwargs: Any) -> None:  
         #c_m_l = self.get_current_mist_level()
@@ -94,10 +96,12 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
         #args = f'{{"humidity":{c_h},"switch":1,"mist_level":{c_m_l}}}'
         args = '{"switch":1}'
         await self._coordinator._my_api.sync_data(self._idx, args)
+        await self._coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         args = '{"switch":0}'
         await self._coordinator._my_api.sync_data(self._idx, args)
+        await self._coordinator.async_request_refresh()
 
     def update_state(self, status: Any) -> None:
         """Midea Humidifier update state."""

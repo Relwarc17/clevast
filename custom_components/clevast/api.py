@@ -76,7 +76,12 @@ class ClevastApiClient:
     
     async def get_device_info(self, device_id) -> dict:
         url = f"{self._baseurl}/clevast/api/device/info/{device_id}"
-        return await self.api_wrapper("get", url, data={}, headers=HEADERS)
+        response = await self.api_wrapper("get", url, data={}, headers=HEADERS)
+        _LOGGER.info("GET device info Response: %s", json.dumps(response, indent=2))
+        if "result" not in response:
+            _LOGGER.error("result not in esponse.")
+            return dict()
+        return response["result"]
     
     async def get_device_data(self, device_id) -> dict:
         url = f"{self._baseurl}/clevast/api/device/manage/sync/get"
@@ -84,10 +89,15 @@ class ClevastApiClient:
             "deviceId": device_id,
             "identifier": "sys_all"
         }
-        return await self.api_wrapper("get", url, data=params, headers=HEADERS)
+        response = await self.api_wrapper("get", url, data=params, headers=HEADERS)
+        _LOGGER.info("GET device data Response: %s", json.dumps(response, indent=2))
+        if "result" not in response:
+            _LOGGER.error("result not in esponse.")
+            return list()
+        return response["result"]
 
 
-    async def sync_data(self, device_id, args: str) -> dict:
+    async def sync_data(self, device_id, args: str) -> ...:
         """Get data from the API."""
         url = f"{self._baseurl}/clevast/api/device/manage/async/set"
         dev_data = {
@@ -95,12 +105,11 @@ class ClevastApiClient:
             "args": args,
             "deviceId": device_id
         }
-        return await self.api_wrapper("post", url, data=dev_data, headers=HEADERS)
+        response =  await self.api_wrapper("post", url, data=dev_data, headers=HEADERS)
+        _LOGGER.info("POST sync data Response: %s", json.dumps(response, indent=2))
+        if "message" in response and "message" != "Success":
+            _LOGGER.error(response["message"])
 
-    async def async_set_title(self, value: str) -> None:
-        """Get data from the API."""
-        url = "https://jsonplaceholder.typicode.com/posts/1"
-        await self.api_wrapper("patch", url, data={"title": value}, headers=HEADERS)
 
     async def _ensure_token(self):
         """Ensure that the token is valid."""
