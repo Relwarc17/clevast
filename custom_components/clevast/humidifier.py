@@ -77,7 +77,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
     async def async_set_mist_level(self, mist_level: int) -> None:
         if mist_level < self._attr_min_mist_level or mist_level > self._attr_max_mist_level:
             return
-        args = f'{"mist_level":{mist_level}}'
+        args = f'{{"mist_level":{mist_level}}}'
         await self._coordinator._my_api.sync_data(self._idx, args)
         await self._coordinator.async_request_refresh()
 
@@ -85,7 +85,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
         if humidity < self._attr_min_humidity or humidity > self._attr_max_humidity:
             _LOGGER.error("Humidity %d not in range", humidity)
             return
-        args = f'{"humidity":{humidity}}'
+        args = f'{{"humidity":{humidity}}}'
         _LOGGER.info("Setting target humidity to %d", humidity)
         await self._coordinator._my_api.sync_data_tests(self._idx, args)
         await self._coordinator.async_request_refresh()
