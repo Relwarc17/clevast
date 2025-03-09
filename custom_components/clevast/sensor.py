@@ -4,7 +4,7 @@ from .const import DEFAULT_NAME
 from .const import DOMAIN
 from .const import ICON
 from .const import SENSOR
-from .humidifier import ClevastEntity
+from .entity import ClevastEntity
 
 from homeassistant.const import PERCENTAGE
 from homeassistant.components.sensor import (

@@ -19,14 +19,16 @@ async def async_setup_entry(hass, entry, async_add_devices):
 
 class ClevastHumidifier(ClevastEntity, HumidifierEntity):
 
+    def __init__(self, coordinator, config_entry):
+        super().__init__(coordinator)
+        self.config_entry = config_entry
+
     @property
     def name(self):
-        """Return the name of the switch."""
         return f"{DEFAULT_NAME}_{SWITCH}"
 
     @property
     def icon(self):
-        """Return the icon of this switch."""
         return ICON
 
     @property

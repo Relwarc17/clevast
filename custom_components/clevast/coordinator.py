@@ -63,8 +63,9 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
         """
         """Update data via library."""
         try:
-
+            _LOGGER.info("Coordinator _async_update_data before async_timeout")
             async with async_timeout.timeout(10):
+                _LOGGER.info("Coordinator _async_update_data after async_timeout")
                 await self._my_api.login()
                 listening_idx = set(self.async_contexts())
                 _LOGGER.info(listening_idx)

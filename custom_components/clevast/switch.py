@@ -5,7 +5,7 @@ from .const import DEFAULT_NAME
 from .const import DOMAIN
 from .const import ICON
 from .const import SWITCH
-from .humidifier import ClevastEntity
+from .entity import ClevastEntity
 
 
 async def async_setup_entry(hass, entry, async_add_devices):

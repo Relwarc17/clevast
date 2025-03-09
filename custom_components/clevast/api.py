@@ -64,12 +64,13 @@ class ClevastApiClient:
     
     
     async def get_devices(self) -> dict:
+        _LOGGER.info("Start request to get devices")
         await self._ensure_token()
         url = f"{self._baseurl}/clevast/api/user/device"
         response = await self.api_wrapper("get", url, headers=HEADERS)
-        _LOGGER.info("API Login Response: %s", json.dumps(response, indent=2))
-        if not "result" in response:
-            return dict()
+        _LOGGER.info("GET devices Response: %s", json.dumps(response, indent=2))
+        if "result" not in response:
+            return list()
         return response["result"]
     
     
