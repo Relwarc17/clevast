@@ -1,11 +1,10 @@
 """Sensor platform for Clevast."""
 
-from .clevast_device import ClevastDeviceInfo
 from .const import DEFAULT_NAME
 from .const import DOMAIN
 from .const import ICON
 from .const import SENSOR
-from .entity import ClevastEntity
+from .humidifier import ClevastEntity
 
 from homeassistant.const import PERCENTAGE
 from homeassistant.components.sensor import (
@@ -32,7 +31,7 @@ class ClevastSensor(ClevastEntity, SensorEntity):
     def __init__(
         self,
         coordinator,
-        device: ClevastDeviceInfo,
+        device,
     ) -> None:
         """Initialize the sensor."""
         super().__init__(coordinator, device)

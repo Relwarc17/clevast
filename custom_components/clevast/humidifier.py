@@ -10,7 +10,17 @@ from .const import VERSION
 
 
 class ClevastEntity(CoordinatorEntity, HumidifierEntity):
+    """An entity using CoordinatorEntity.
+
+    The CoordinatorEntity class provides:
+      should_poll
+      async_update
+      async_added_to_hass
+      available
+
+    """
     def __init__(self, coordinator, config_entry):
+        """Pass coordinator to CoordinatorEntity."""
         super().__init__(coordinator, config_entry)
         self.config_entry = config_entry
 
@@ -24,7 +34,7 @@ class ClevastEntity(CoordinatorEntity, HumidifierEntity):
         return {
             "identifiers": {(DOMAIN, self.unique_id)},
             "name": NAME,
-            "model": VERSION,
+            "model": self.config_entry.model,
             "manufacturer": NAME,
         }
 
@@ -36,6 +46,12 @@ class ClevastEntity(CoordinatorEntity, HumidifierEntity):
             "id": str(self.coordinator.data.get("id")),
             "integration": DOMAIN,
         }
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        """Handle updated data from the coordinator."""
+        self._attr_is_on = self.coordinator.data[self.idx]["state"]
+        self.async_write_ha_state()
 
     async def set_mode(self, mode):
         """Set new target preset mode."""
@@ -70,10 +86,15 @@ class ClevastEntity(CoordinatorEntity, HumidifierEntity):
         # Update the data
         await self.coordinator.async_request_refresh()
 
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        self._attr_is_on = self.coordinator.data[self.config_entry]["state"]
-        self.async_write_ha_state()
+    async def async_turn_on(self, **kwargs):
+        """Turn the light on.
+
+        Example method how to request data updates.
+        """
+        # Do the turning on.
+        # ...
+
+        # Update the data
+        await self.coordinator.async_request_refresh()
 
        

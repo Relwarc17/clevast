@@ -5,16 +5,16 @@ from .const import DEFAULT_NAME
 from .const import DOMAIN
 from .const import ICON
 from .const import SWITCH
-from .entity import ClevastEntity
+from .humidifier import ClevastEntity
 
 
 async def async_setup_entry(hass, entry, async_add_devices):
     """Setup sensor platform."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_devices([ClevastBinarySwitch(coordinator, entry)])
+    async_add_devices([ClevastSwitch(coordinator, entry)])
 
 
-class ClevastBinarySwitch(ClevastEntity, SwitchEntity):
+class ClevastSwitch(ClevastEntity, SwitchEntity):
     """clevast switch class."""
 
     async def async_turn_on(self, **kwargs):  # pylint: disable=unused-argument

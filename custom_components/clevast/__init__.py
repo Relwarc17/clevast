@@ -6,8 +6,14 @@ https://github.com/Relwarc17/clevast
 """
 import asyncio
 import logging
+import json
 from datetime import timedelta
 
+from .coordinator import ClevastDataUpdateCoordinator
+
+from .humidifier import ClevastEntity
+
+from .clevast_device import ClevastDeviceInfo, ClevastDevices
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core_config import Config
 from homeassistant.core import HomeAssistant
@@ -28,9 +34,26 @@ SCAN_INTERVAL = timedelta(seconds=30)
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
-async def async_setup(hass: HomeAssistant, config: Config):
-    """Set up this integration using YAML is not supported."""
-    return True
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Config entry example."""
+    # assuming API object stored here by __init__.py
+    my_api = hass.data[DOMAIN][config_entry.entry_id]
+    coordinator = ClevastDataUpdateCoordinator(hass, config_entry, my_api)
+
+    # Fetch initial data so we have data when entities subscribe
+    #
+    # If the refresh fails, async_config_entry_first_refresh will
+    # raise ConfigEntryNotReady and setup will try again later
+    #
+    # If you do not want to retry setup on failure, use
+    # coordinator.async_refresh() instead
+    #
+    await coordinator.async_config_entry_first_refresh()
+
+    _LOGGER.info("Coordinator data: %s", json.dumps(coordinator.data, indent=2))
+    async_add_entities(
+        ClevastEntity(coordinator, idx) for idx, ent in enumerate(coordinator.data)
+    )
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -44,61 +67,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     session = async_get_clientsession(hass)
     client = ClevastApiClient(username, password, session)
-
-    coordinator = ClevastDataUpdateCoordinator(hass, entry, client=client)
+    hass.data[DOMAIN][entry.entry_id] = client
+    coordinator = ClevastDataUpdateCoordinator(hass, entry)
     await coordinator.async_refresh()
 
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
-
-    for platform in PLATFORMS:
-        if entry.options.get(platform, True):
-            coordinator._platforms.append(platform)
-            hass.async_add_job(
-                await hass.config_entries.async_forward_entry_setups(entry, platform)
-            )
+    devices: ClevastDevices = client.get_devices()
+    for device in devices:
+       dev = ClevastDeviceInfo(device)
+    #for platform in PLATFORMS:
+    #    if entry.options.get(platform, True):
+    #        coordinator._platforms.append(platform)
+    #        hass.async_add_job(
+    #            await hass.config_entries.async_forward_entry_setups(entry, platform)
+    #        )
 
     entry.add_update_listener(async_reload_entry)
     return True
 
-
-class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching data from the API."""
-
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        client: ClevastApiClient,
-    ) -> None:
-        """Initialize."""
-        self._api = client
-        self._platforms = []
-        self._device = None
-        super().__init__(hass, _LOGGER, name=DOMAIN, config_entry = entry, update_interval=SCAN_INTERVAL)
-
-    async def _async_setup(self):
-        """Set up the coordinator
-
-        This is the place to set up your coordinator,
-        or to load data, that only needs to be loaded once.
-
-        This method will be called automatically during
-        coordinator.async_config_entry_first_refresh.
-        """
-        self._device = await self._api.get_device()
-
-    async def _async_update_data(self):
-        
-        """Update data via library."""
-        try:
-            await self._api.login()
-            
-            return await self._api.get_device()
-        except Exception as exception:
-            raise UpdateFailed() from exception
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

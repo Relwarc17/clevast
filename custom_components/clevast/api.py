@@ -9,6 +9,8 @@ import time
 import aiohttp
 import async_timeout
 
+from homeassistant.exceptions import ConfigEntryAuthFailed
+
 TIMEOUT = 30
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
@@ -53,7 +55,7 @@ class ClevastApiClient:
         _LOGGER.info(response["message"])
         if "message" not in response and response["message"] != "Success":
             _LOGGER.error("Error authenticating")
-            #raise aiohttp.web.HTTPUnauthorized
+            raise ConfigEntryAuthFailed
         _LOGGER.info(response["result"])
         self._token = response["result"]["token"]
         self._last_login_time = time.time()
@@ -61,7 +63,7 @@ class ClevastApiClient:
         _LOGGER.info("Login succesfull, Token acquired.")
     
     
-    async def get_device(self) -> dict:
+    async def get_devices(self) -> dict:
         await self._ensure_token()
         url = f"{self._baseurl}/clevast/api/user/device"
         response = await self.api_wrapper("get", url, headers=HEADERS)

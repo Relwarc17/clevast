@@ -1,7 +1,9 @@
-from typing import Any, TypedDict, cast
+from typing import Any, TypedDict, list
 
+class ClevastDevices():
+    result: list[dict]
 
-class ClevastDeviceInfo(TypedDict):
+class ClevastDeviceInfo(TypedDict, total=False):
     """Device information returned by the API"""
     id: str
     name: str
