@@ -18,7 +18,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
             continue
         device["version"] = "2.0.11"
         async_add_entities(
-            ClevastSwitch(coordinator, device["deviceId"])
+            [ClevastSwitch(coordinator, device["deviceId"])]
         )
 
 

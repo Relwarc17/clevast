@@ -28,7 +28,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
             continue
         device["version"] = "2.0.11"
         async_add_entities(
-            ClevastHumidifier(coordinator, device["deviceId"])
+            [ClevastHumidifier(coordinator, device["deviceId"])]
         )
 
 class ClevastHumidifier(ClevastEntity, HumidifierEntity):
