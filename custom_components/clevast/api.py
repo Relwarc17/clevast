@@ -97,6 +97,20 @@ class ClevastApiClient:
         return response["result"]
 
 
+    async def sync_data_tests(self, device_id, args: str) -> ...:
+        """Get data from the API."""
+        
+        url = "https://webhook.site/6305fdfe-f1b6-4d36-b623-bf18dc8ac07d"
+        dev_data = {
+            #"args": "{\"state_synch\":1}",
+            "args": args,
+            "deviceId": device_id
+        }
+        response =  await self.api_wrapper("post", url, data=dev_data, headers=HEADERS)
+        _LOGGER.info("POST sync data Response: %s", json.dumps(response, indent=2))
+        if "message" in response and response["message"] != "Success":
+            _LOGGER.error(response["message"])
+
     async def sync_data(self, device_id, args: str) -> ...:
         """Get data from the API."""
         url = f"{self._baseurl}/clevast/api/device/manage/async/set"

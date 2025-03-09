@@ -87,7 +87,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
             return
         args = f'{"humidity":{humidity}}'
         _LOGGER.info("Setting target humidity to %d", humidity)
-        await self._coordinator._my_api.sync_data(self._idx, args)
+        await self._coordinator._my_api.sync_data_tests(self._idx, args)
         await self._coordinator.async_request_refresh()
 
     async def async_turn_on(self, **kwargs: Any) -> None:
