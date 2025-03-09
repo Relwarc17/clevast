@@ -93,7 +93,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
         #c_h = self.get_current_humidity()
         #args = f'{{"humidity":{c_h},"switch":1,"mist_level":{c_m_l}}}'
         args = '{"switch":1}'
-        self._coordinator._my_api.sync_data(self._idx, args)
+        await self._coordinator._my_api.sync_data(self._idx, args)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         args = '{"switch":0}'
@@ -104,10 +104,6 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
         if not self.hass:
             _LOGGER.error("Humidifier update_state for %s [%s]", self.name, type(self))
         self.schedule_update_ha_state()
-    
-    async def async_set_mode(self, mode):
-        """Set new target preset mode."""
-        return True
 
 
     @callback
