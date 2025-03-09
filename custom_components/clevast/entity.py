@@ -22,7 +22,7 @@ class ClevastEntity(CoordinatorEntity):
         super().__init__(coordinator, context=idx)
         self._device_id = coordinator._devices[0]["deviceId"]
         self._device_name = coordinator._devices[0]["nickname"]
-        self._state = None
+        self._state = self._coordinator.data.get("status")
         self._available = True
         self._device_type = coordinator._devices[0]["productType"].capitalize()
         self._coordinator = coordinator
@@ -41,7 +41,7 @@ class ClevastEntity(CoordinatorEntity):
                 # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.unique_id)
             },
-            name = self._device_name | "{NAME} - Humidifier - hardoced",
+            name = self._device_name,
             manufacturer = NAME,
             model = self._coordinator._devices[0]["model"],
             model_id = self._coordinator._devices[0]["deviceId"],

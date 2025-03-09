@@ -48,7 +48,7 @@ class ClevastSensor(ClevastEntity, SensorEntity):
     @property
     def entity_id(self):
         """Return a unique ID to use for this entity."""
-        return f"sensor.{self.entity_id_base}_humidity"
+        return f"sensor.{self.unique_id}_humidity"
 
     @property
     def name(self):

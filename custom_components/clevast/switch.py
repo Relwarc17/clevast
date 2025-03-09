@@ -36,7 +36,7 @@ class ClevastSwitch(ClevastEntity, SwitchEntity):
     @property
     def entity_id(self):
         """Return a unique ID to use for this entity."""
-        return f"switch.{self.entity_id_base}_humidity"
+        return f"switch.{self.unique_id}_humidity"
 
     async def async_turn_on(self, **kwargs):  # pylint: disable=unused-argument
         """Turn on the switch."""
