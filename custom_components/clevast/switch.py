@@ -42,13 +42,13 @@ class ClevastSwitch(ClevastEntity, SwitchEntity):
         """Turn on the switch."""
         args = '{"switch":1}'
         await self._coordinator._my_api.sync_data(self._idx, args)
-        await self.coordinator.async_request_refresh()
+        await self._coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):  # pylint: disable=unused-argument
         """Turn off the switch."""
         args = '{"switch":0}'
         await self._coordinator._my_api.sync_data(self._idx, args)
-        await self.coordinator.async_request_refresh()
+        await self._coordinator.async_request_refresh()
 
     @property
     def name(self):
@@ -63,4 +63,4 @@ class ClevastSwitch(ClevastEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if the switch is on."""
-        return self.coordinator.data.get("status", 0) == 1
+        return self._coordinator.data.get("status", 0) == 1

@@ -22,7 +22,7 @@ class ClevastEntity(CoordinatorEntity):
         super().__init__(coordinator, context=idx)
         self._device_id = coordinator._devices[0]["deviceId"]
         self._device_name = coordinator._devices[0]["nickname"]
-        self._state = self._coordinator.data.get("status")
+        self._state = coordinator.data.get("status")
         self._available = True
         self._device_type = coordinator._devices[0]["productType"].capitalize()
         self._coordinator = coordinator

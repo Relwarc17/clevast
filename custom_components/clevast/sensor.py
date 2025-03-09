@@ -58,7 +58,7 @@ class ClevastSensor(ClevastEntity, SensorEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self.coordinator.data.get("status")
+        return self._coordinator.data.get("status")
 
     @property
     def icon(self):
@@ -73,4 +73,4 @@ class ClevastSensor(ClevastEntity, SensorEntity):
     @property
     def native_value(self) -> int:
         """Return current environment humidity."""
-        return self.coordinator.data.get("current_humidity")
+        return self._coordinator.data.get("current_humidity")
