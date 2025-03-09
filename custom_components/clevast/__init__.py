@@ -89,6 +89,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     #            continue
     #        coordinator._platforms.append(platform)
 
+    await hass.config_entries.async_forward_entry_setups(entry, ["humidifier", "sensor", "switch"])
     
         
 
