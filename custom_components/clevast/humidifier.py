@@ -124,8 +124,8 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
             },
             name = self.name,
             manufacturer = NAME,
-            model = self._coordinator._devices[0].model,
-            model_id = self._coordinator._devices[0].deviceId,
+            model = self._coordinator._devices[0]["model"],
+            model_id = self._coordinator._devices[0]["deviceId"],
             sw_version = "0.0.0",
         )
 
