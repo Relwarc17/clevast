@@ -33,45 +33,40 @@ SCAN_INTERVAL = timedelta(seconds=30)
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
-
-async def async_setup(hass, config):
-    # Return boolean to indicate that initialization was successful.
+async def async_setup(hass: HomeAssistant, config: Config):
+    """Set up this integration using YAML is not supported."""
     return True
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
-    """Config entry example."""
 
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up this integration using UI."""
     if hass.data.get(DOMAIN) is None:
         hass.data.setdefault(DOMAIN, {})
         _LOGGER.info(STARTUP_MESSAGE)
 
-    username = config_entry.data.get(CONF_USERNAME)
-    password = config_entry.data.get(CONF_PASSWORD)
+    username = entry.data.get(CONF_USERNAME)
+    password = entry.data.get(CONF_PASSWORD)
 
     session = async_get_clientsession(hass)
     my_api = ClevastApiClient(username, password, session)
 
-    coordinator = ClevastDataUpdateCoordinator(hass, config_entry, my_api)
+    coordinator = ClevastDataUpdateCoordinator(hass, entry, my_api)
+    await coordinator.async_refresh()
 
-    # Fetch initial data so we have data when entities subscribe
-    #
-    # If the refresh fails, async_config_entry_first_refresh will
-    # raise ConfigEntryNotReady and setup will try again later
-    #
-    # If you do not want to retry setup on failure, use
-    # coordinator.async_refresh() instead
-    #
-    await coordinator.async_config_entry_first_refresh()
+    if not coordinator.last_update_success:
+        raise ConfigEntryNotReady
 
-    _LOGGER.info("Coordinator data: %s", json.dumps(coordinator.data, indent=2))
-    async_add_entities(
-        ClevastEntity(coordinator, idx) for idx, ent in enumerate(coordinator.data)
-    )
-    config_entry.add_update_listener(async_reload_entry)
-    return True 
+    hass.data[DOMAIN][entry.entry_id] = coordinator
 
+    for platform in PLATFORMS:
+        if entry.options.get(platform, True):
+            coordinator.platforms.append(platform)
+            hass.async_add_job(
+                hass.config_entries.async_forward_entry_setup(entry, platform)
+            )
 
+    entry.add_update_listener(async_reload_entry)
+    return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Handle removal of an entry."""

@@ -15,10 +15,12 @@ ICON = "mdi:format-quote-close"
 BINARY_SENSOR_DEVICE_CLASS = "connectivity"
 
 # Platforms
-BINARY_SENSOR = "binary_sensor"
+#BINARY_SENSOR = "binary_sensor"
 SENSOR = "sensor"
 SWITCH = "switch"
-PLATFORMS = [BINARY_SENSOR, SENSOR, SWITCH]
+HUMIDIFIER = "humidifier"
+#PLATFORMS = [BINARY_SENSOR, SENSOR, SWITCH]
+PLATFORMS = [HUMIDIFIER, SENSOR, SWITCH]
 
 
 
