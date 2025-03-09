@@ -95,8 +95,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     #        if entry.options.get(platform, False):
     #            continue
     #        coordinator._platforms.append(platform)
-
-    await hass.config_entries.async_forward_entry_setups(entry, ["humidifier", "sensor", "switch"])
+    
+    #await hass.config_entries.async_forward_entry_setups(entry, ["humidifier", "sensor", "switch"])
+    await hass.config_entries.async_forward_entry_setups(entry, ["humidifier"])
     
         
 
