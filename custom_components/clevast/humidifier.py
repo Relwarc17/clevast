@@ -43,7 +43,6 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
         self._attr_min_mist_level: 1
         self._attr_max_mist_level: 8
         self._attr_device_class = HumidifierDeviceClass.HUMIDIFIER
-        self._attr_supported_features = HumidifierEntityFeature.MODES
 
     @property
     def unique_id(self):
