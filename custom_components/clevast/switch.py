@@ -30,7 +30,7 @@ class ClevastSwitch(ClevastEntity, SwitchEntity):
     @property
     def name(self):
         """Return the name of the switch."""
-        return f"{DEFAULT_NAME}_{SWITCH}"
+        return f"{DEFAULT_NAME}_humidifier_{SWITCH}"
 
     @property
     def icon(self):

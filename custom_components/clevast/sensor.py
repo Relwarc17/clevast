@@ -42,7 +42,7 @@ class ClevastSensor(ClevastEntity, SensorEntity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return f"{DEFAULT_NAME}_{SENSOR}"
+        return f"{DEFAULT_NAME}_humidity_{SENSOR}"
 
     @property
     def state(self):

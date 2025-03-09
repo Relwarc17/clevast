@@ -20,11 +20,12 @@ class ClevastEntity(CoordinatorEntity):
     def __init__(self, coordinator, config_entry):
         super().__init__(coordinator)
         self._config_entry = config_entry
-        self._device_id = None  # To store the dynamic device_id
-        self._device_name = None  # To store the dynamic deviceName
+        self._device_id = coordinator._devices[0]["deviceId"]
+        self._device_name = coordinator._devices[0]["nickname"]
         self._state = None
         self._available = True
-        self._device_type = "Humidifier"
+        self._device_type = coordinator._devices[0]["productType"].capitalize()
+        self._coordinaor = coordinator
 
     @property
     def unique_id(self):
@@ -47,7 +48,7 @@ class ClevastEntity(CoordinatorEntity):
             },  # Match the registered device ID
             "name": self._device_name,  # Use the dynamic deviceName
             "manufacturer": NAME,
-            "model": f"Mars Hydro {self._device_type.capitalize()}",
+            "model": f"Mars Hydro {self._device_type}",
         }
         return {
             "identifiers": {(DOMAIN, self.unique_id)},

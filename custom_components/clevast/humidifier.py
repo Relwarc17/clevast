@@ -57,14 +57,14 @@ class MyCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             # Name of the data. For logging purposes.
-            name = "My sensor",
+            name = "Clevast - humidifier",
             config_entry = config_entry,
             # Polling interval. Will only be polled if there are subscribers.
             update_interval = timedelta(seconds=30),
             # Set always_update to `False` if the data returned from the
             # api can be compared via `__eq__` to avoid duplicate updates
             # being dispatched to listeners
-            always_update = True
+            always_update = False
         )
         _LOGGER.info("Initializing Cordinator")
         self._platforms = []
@@ -116,7 +116,20 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
     @property
     def unique_id(self):
         """Return a unique ID to use for this entity."""
-        return self._coordinator.config_entry.entry_id
+        return self._coordinator._devices[0]["deviceId"]
+
+    @property
+    def name(self):
+        return f"{NAME} - Humidifier"
+
+    @property
+    def icon(self):
+        return ICON
+
+    @property
+    def is_on(self):
+        """Return true if the switch is on."""
+        return self._coordinator.data.get("title", "") == "foo"
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -126,7 +139,7 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
                 # Serial numbers are unique identifiers within a specific domain
                 (DOMAIN, self.unique_id)
             },
-            name = self.name,
+            name = self.name | "{NAME} - Humidifier - hardoced",
             manufacturer = NAME,
             model = self._coordinator._devices[0]["model"],
             model_id = self._coordinator._devices[0]["deviceId"],
@@ -142,18 +155,6 @@ class ClevastHumidifier(CoordinatorEntity, HumidifierEntity):
             "integration": DOMAIN,
         }
 
-    @property
-    def name(self):
-        return f"{NAME} - Humidifier"
-
-    @property
-    def icon(self):
-        return ICON
-
-    @property
-    def is_on(self):
-        """Return true if the switch is on."""
-        return self._coordinator.data.get("title", "") == "foo"
     
     async def async_set_mode(self, mode):
         """Set new target preset mode."""
