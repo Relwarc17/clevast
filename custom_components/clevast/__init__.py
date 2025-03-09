@@ -61,7 +61,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     _LOGGER.info("Setting entries up")
     
-    device_registry = await dr.async_get(hass)
+    device_registry = dr.async_get(hass)
 
     for device in coordinator._devices:
         platforms = PLATFORMS
