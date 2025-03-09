@@ -113,7 +113,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
-        self._attr_is_on = self.coordinator.data[self.config_entry]["status"]
+        self._attr_is_on = self._coordinator.data.get("status", 0) 
         self.async_write_ha_state()
 
        
