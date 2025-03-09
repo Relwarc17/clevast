@@ -75,7 +75,7 @@ class ClevastApiClient:
         return response["result"]
     
     
-    async def async_get_data(self, device_id) -> dict:
+    async def get_device_data(self, device_id) -> dict:
         """Get data from the API."""
         url = f"{self._baseurl}/clevast/api/device/manage/async/set"
         dev_data = {
@@ -99,11 +99,8 @@ class ClevastApiClient:
     ) -> dict:
         """Get information from the API."""
         try:
-            _LOGGER.debug("Before async_timeout")
             async with async_timeout.timeout(TIMEOUT):
-                _LOGGER.debug("Inside async_timeout")
                 if method == "get":
-                    _LOGGER.info("Sending GET request")
                     response = await self._session.get(url, headers=headers)
                     #return await response.json()
 
@@ -114,7 +111,6 @@ class ClevastApiClient:
                     response = await self._session.patch(url, headers=headers, json=data)
 
                 elif method == "post":
-                    _LOGGER.info("Sending POST request")
                     response = await self._session.post(url, headers=headers, json=data)
                     #return await response.json()
                 return await response.json()

@@ -72,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             config_entry_id = entry.entry_id,
             identifiers = {(DOMAIN, device["deviceId"])},
             manufacturer = NAME,
-            name = device["deviceName"],
+            name = f'{NAME} - {device["productName"]}',
             model = device["model"],
             name_by_user = device["nickname"],
         )

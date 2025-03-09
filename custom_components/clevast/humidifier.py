@@ -6,6 +6,7 @@ from homeassistant.core import callback
 
 
 from .const import DOMAIN
+from .const import NAME
 from .const import ICON
 
 import logging
@@ -25,7 +26,7 @@ class ClevastHumidifier(ClevastEntity, HumidifierEntity):
 
     @property
     def name(self):
-        return f"{DEFAULT_NAME}_{SWITCH}"
+        return f"{NAME} - Humidifier"
 
     @property
     def icon(self):
