@@ -123,7 +123,7 @@ class ClevastApiClient:
         try:
             async with async_timeout.timeout(TIMEOUT):
                 if method == "get":
-                    response = await self._session.get(url, params=data, headers=headers, proxy="http://192.168.178.62:8080")
+                    response = await self._session.get(url, params=data, headers=headers, proxy="http://192.168.178.62:8080", ssl=False)
                     #return await response.json()
 
                 elif method == "put":
