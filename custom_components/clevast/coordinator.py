@@ -53,7 +53,7 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
         coordinator.async_config_entry_first_refresh.
         """
         _LOGGER.info("Cordinator _async_setup")
-        self._devices = self._my_api.get_devices()
+        self._devices = await self._my_api.get_devices()
 
 
     async def _async_update_data(self) -> ...:
@@ -71,7 +71,7 @@ class ClevastDataUpdateCoordinator(DataUpdateCoordinator):
                 listening_idx = set(self.async_contexts())
                 _LOGGER.info("Listening idx: %s", listening_idx)
                 #return await self.my_api.fetch_data(listening_idx)
-                return self._my_api.get_device_data(listening_idx)
+                return await self._my_api.get_device_data(listening_idx)
         except Exception as exception:
             raise UpdateFailed() from exception
 
