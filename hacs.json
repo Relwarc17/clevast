@@ -1,12 +1,9 @@
 {
   "name": "Clevast",
   "domains": [
-    "binary_sensor",
-    "sensor",
-    "switch",
     "humidifier"
   ],
   "iot_class": "Cloud Polling",
-  "homeassistant": "2025.2.4",
-  "hacs": "2.0.1"
+  "homeassistant": "2025.3.1",
+  "hacs": "2.0.5"
 }
